@@ -112,3 +112,44 @@ variable "vms_ssh_public_root_key" {
   type        = string
 }
 
+# Задача 3 с тремя дисками
+# Конфигурация дисков
+variable "storage_disks" {
+  type = list(object({
+    name = string
+    size = number
+    type = string
+  }))
+  default = [
+    { name = "extra-disk-1", size = 1, type = "network-hdd" },
+    { name = "extra-disk-2", size = 1, type = "network-hdd" },
+    { name = "extra-disk-3", size = 1, type = "network-hdd" },
+  ]
+}
+
+# Конфигурация одиночной ВМ storage
+variable "storage_vm" {
+  type = object({
+    name         = string
+    platform_id  = string
+    zone         = string
+    cores        = number
+    memory       = number
+    core_fraction= number
+    boot_disk_size = number
+    boot_disk_type = string
+    preemptible  = bool
+  })
+  default = {
+    name          = "storage"
+    platform_id   = "standard-v3"
+    zone          = "ru-central1-b"
+    cores         = 2
+    memory        = 1
+    core_fraction = 20
+    boot_disk_size = 10
+    boot_disk_type = "network-hdd"
+    preemptible   = true
+  }
+}
+
