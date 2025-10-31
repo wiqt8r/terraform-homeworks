@@ -1,17 +1,17 @@
 [webservers]
 %{ for i in web ~}
-${i.name} ansible_host=${i.network_interface[0].nat_ip_address} fqdn=${i.network_interface[0].fqdn}
-%{ endfor }
+${i.name} ansible_host=${try(i.network_interface[0].nat_ip_address, i.network_interface[0].ip_address)} fqdn=${try(i.fqdn, "")}
+%{ endfor ~}
 
 [dbservers]
 %{ for i in db ~}
-${i.name} ansible_host=${i.network_interface[0].nat_ip_address} fqdn=${i.network_interface[0].fqdn}
-%{ endfor }
+${i.name} ansible_host=${try(i.network_interface[0].nat_ip_address, i.network_interface[0].ip_address)} fqdn=${try(i.fqdn, "")}
+%{ endfor ~}
 
 [storage]
 %{ for i in storage ~}
-${i.name} ansible_host=${i.network_interface[0].nat_ip_address} fqdn=${i.network_interface[0].fqdn}
-%{ endfor }
+${i.name} ansible_host=${try(i.network_interface[0].nat_ip_address, i.network_interface[0].ip_address)} fqdn=${try(i.fqdn, "")}
+%{ endfor ~}
 
 [all:vars]
 ansible_user=ubuntu

@@ -16,20 +16,25 @@ locals {
 # ресурс для генерации инвентаря
 resource "local_file" "ansible_inventory" {
   content = templatefile("${path.module}/hosts.tftpl", {
-    web     = yandex_compute_instance.web
-    db      = yandex_compute_instance.db
-    storage = [yandex_compute_instance.storage]
+    web     = yandex_compute_instance.web                 # уже list (tuple)
+    db      = values(yandex_compute_instance.db)          # map -> list
+    storage = [yandex_compute_instance.storage]           # singleton -> list
   })
-
   filename = "${abspath(path.module)}/hosts.ini"
 }
 
-### ниже ничего не менял
+
+### берем код из демонстрации
 
 resource "null_resource" "web_hosts_provision" {
   count = var.web_provision == true ? 1 : 0
   #Ждем создания инстанса
-  depends_on = [yandex_compute_instance.example, yandex_compute_instance.bastion]
+  #depends_on = [yandex_compute_instance.example, yandex_compute_instance.bastion]
+  depends_on = [
+    yandex_compute_instance.web,     # все web-ВМ (count)
+    yandex_compute_instance.db,      # все db-ВМ (for_each)
+    yandex_compute_instance.storage, # одиночная ВМ storagr
+  ]
 
   #Добавление ПРИВАТНОГО ssh ключа в ssh-agent
   provisioner "local-exec" {
@@ -68,7 +73,11 @@ resource "null_resource" "web_hosts_provision" {
     # playbook_src_hash = file("${abspath(path.module)}/test.yml") # при изменении содержимого playbook файла
     # ssh_public_key = var.public_key # при изменении переменной with ssh
     # template_rendered = "${local_file.hosts_templatefile.content}" #при изменении inventory-template
-    password_change = jsonencode( {for k,v in random_password.each: k=>v.result})
+    # password_change = jsonencode( {for k,v in random_password.each: k=>v.result}) #ресурса рандом пассворд нет, убираю
+    ### поскольку рандом пассворда нет, будем триггериться на имя ВМ
+    web_vms    = join(",", [for i in yandex_compute_instance.web : i.name])
+    db_vms     = join(",", [for i in values(yandex_compute_instance.db) : i.name])
+    storage_vm = yandex_compute_instance.storage.name
 
   }
 
