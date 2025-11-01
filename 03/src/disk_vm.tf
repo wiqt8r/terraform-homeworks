@@ -10,6 +10,7 @@ resource "yandex_compute_disk" "extra_disks" {
 # одиночная ВМ storage
 resource "yandex_compute_instance" "storage" {
   name        = var.storage_vm.name
+  hostname    = var.storage_vm.name
   platform_id = var.storage_vm.platform_id
   zone        = var.storage_vm.zone
 

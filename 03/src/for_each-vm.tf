@@ -6,6 +6,7 @@ resource "yandex_compute_instance" "db" {
   for_each = local.db_vms
 
   name        = "db-${each.key}"
+  hostname    = "db-${each.key}"
   platform_id = var.vm_db_platform_id
   zone        = each.value.zone
 

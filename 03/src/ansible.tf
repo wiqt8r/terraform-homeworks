@@ -52,8 +52,8 @@ resource "null_resource" "web_hosts_provision" {
   #Запуск ansible-playbook
   provisioner "local-exec" {
     # without secrets
-    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${abspath(path.module)}/for.ini ${abspath(path.module)}/test.yml"
-
+    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${abspath(path.module)}/hosts.ini ${abspath(path.module)}/test.yml"
+# выше заменил for.ini на hosts.ini
     #secrets pass
     #> nonsensitive(jsonencode( {for k,v in random_password.each: k=>v.result}))
     /*
